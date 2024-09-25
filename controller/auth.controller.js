@@ -1,8 +1,15 @@
-const {generateToken,hashPassword} = require("../utils/helperFunc")
+const {generateToken,hashPassword,generateNumericOTP} = require("../utils/helperFunc")
+const UserModel = require("../models/users.models")
+const cloudinary = require("../utils/cloudinary")
+const {SendMail} = require("../utils/email")
+const {
+    validateUserRegisterInput,   
+    } = require('../validator/validator')
 
 class AuthController{
     async Register(req, res) {
         try {
+            console.log(req.body)
           const { error } = validateUserRegisterInput.validate(req.body);
       
           // If validation fails, return an error response
@@ -10,36 +17,34 @@ class AuthController{
             return res.status(400).json({ status: false, data: { message: error.details[0].message } });
           }
       
-          const { email, password, first_name, last_name, img } = req.body;
+          const { email, password, first_name,dob,gender,phone, last_name, img } = req.body;
       
           // Check if the email already exists
           const emailExist = await UserModel.findOne({ email });
           if (emailExist) {
-            return res.status(400).json({ status: false, data: { message: UserExistMessage } });
+            return res.status(400).json({ status: false, data: { message: "email already exist" } });
           }
       
           // Hash the password
           const hash = await hashPassword(password);
       
           // If an image is provided, upload it to Cloudinary
-          let imgUrl = null;
-          if (img) {
-            const result = await cloudinary.uploader.upload(img, {
+            const result = await cloudinary.uploader.upload(req.file.path, {
               folder: "users", 
-      
             });
-            imgUrl = result.secure_url; 
-          }
+  
+          
       
           // Create a new user
           const newUser = await UserModel.create({
             email,
             first_name,
             last_name,
+            dob,
+            phone,
+            gender,
             password: hash,
-            role: userRoleBase.user,
-            cashback_wallet: 0,
-            img: imgUrl,  
+            img:result.secure_url,  
           });
       
           // Generate OTP code

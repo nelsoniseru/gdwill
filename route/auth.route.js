@@ -1,5 +1,6 @@
 const express = require("express")
 const authController = require("../controller/auth.controller")
+const upload = require("../utils/multer")
 const {
     validateUserLoginInput,
     validateUserRegisterInput,
@@ -10,7 +11,7 @@ const {authMiddleWare} = require("../middleware/auth.middleware")
 
 const router = express.Router()
 
-router.post("/register",authController.Register)
+router.post("/register",upload.single('img'),authController.Register)
 router.post("/login",authController.Login)
 router.post("/resend-code",authController.PostResend)
 router.post("/verify-code",authController.PostVerifyCode)

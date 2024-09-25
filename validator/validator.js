@@ -8,7 +8,10 @@ const validateUserRegisterInput = Joi.object({
     first_name: Joi.string().required(),
     last_name: Joi.string().required(),
     email: Joi.string().email().required(),
-    img: Joi.string().required(),
+    img: Joi.string().allow(),
+    dob: Joi.date().required(),
+    gender: Joi.string().required(),
+    phone: Joi.string().required(),
     password: Joi.string()
       .min(8).required().messages({
         'string.min': 'password must be at least 8 characters long',

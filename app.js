@@ -16,7 +16,9 @@ app.use(cors())
 app.use(express.json());
 
 app.use("/api/v1/auth",authRoutes)
-
+app.get("/",(req,res)=>{
+    res.send("it works")
+})
 var port = process.env.PORT || 5003
 app.listen(port,()=>{
     console.log("app running on port "+port)

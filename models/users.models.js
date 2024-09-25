@@ -4,7 +4,10 @@ const userSchema = new mongoose.Schema({
     first_name: String,
     last_name: String,
     email: String,
-    gender:String,
+    gender:{
+        type: String,
+        enum: ["male", "female"],  
+      }, 
     dob:Date,
     pin:String,
     phone:String,
@@ -22,5 +25,7 @@ const userSchema = new mongoose.Schema({
 });
   
 const User = mongoose.model('User', userSchema);
-
+User.find().then(e=>{
+    console.log(e)
+})
 module.exports = User
