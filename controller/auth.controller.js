@@ -145,7 +145,7 @@ class AuthController{
       const {email,v_code} = req.body
       const user = await UserModel.findOne({ email });
       if (!user) return res.status(404).json({status:false, data:{message:"user not found"}});
-      if (user.v_code !== code)return res.status(400).json({status:false, data:{message:"verification code is incorrect"}})
+      if (user.v_code !== v_code)return res.status(400).json({status:false, data:{message:"verification code is incorrect"}})
       user.v_code= '';
       user.verified=true;
       await user.save();
