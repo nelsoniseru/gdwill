@@ -51,11 +51,19 @@ const validateResetPasswordInput = Joi.object({
       })
     })
 
-
+    const validateOtpInput =Joi.object({
+      email: Joi.any().strip(),
+      v_code: Joi.string()
+        .required()
+        .min(6)
+        .max(6)
+      })
+    
  
 
    module.exports =  {
   validateUserLoginInput,
   validateUserRegisterInput,
+  validateOtpInput
  
 };

@@ -6,7 +6,8 @@ const {SendMail} = require("../utils/email")
 const {generateToken} = require("../middleware/auth.middleware")
 const {
     validateUserRegisterInput, 
-    validateUserLoginInput  
+    validateUserLoginInput,
+    validateOtpInput
     } = require('../validator/validator')
 
 class AuthController{
