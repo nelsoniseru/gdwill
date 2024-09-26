@@ -1,15 +1,17 @@
-const {generateToken,hashPassword,generateNumericOTP} = require("../utils/helperFunc")
+const {hashPassword,generateNumericOTP} = require("../utils/helperFunc")
 const UserModel = require("../models/users.models")
+const bcrypt = require("bcryptjs")
 const cloudinary = require("../utils/cloudinary")
 const {SendMail} = require("../utils/email")
+const {generateToken} = require("../middleware/auth.middleware")
 const {
-    validateUserRegisterInput,   
+    validateUserRegisterInput, 
+    validateUserLoginInput  
     } = require('../validator/validator')
 
 class AuthController{
     async Register(req, res) {
         try {
-            console.log(req.body)
           const { error } = validateUserRegisterInput.validate(req.body);
       
           // If validation fails, return an error response
@@ -48,20 +50,20 @@ class AuthController{
           });
       
           // Generate OTP code
-          let code = generateNumericOTP(6);
+          let v_code = generateNumericOTP(6);
       
           // Prepare the email message
           const msg = {
             from: '"From IReach"',
             to: email,
             subject: 'Verification Code',
-            html: `<h2>Dear User, your verification code: ${code} </h2>`,
+            html: `<h2>Dear User, your verification code: ${v_code} </h2>`,
           };
       
           // Send verification email
           const mail = await SendMail(msg);
           if (mail.messageId) {
-            newUser.code = code;
+            newUser.v_code = v_code;
             await newUser.save();
       
             return res.status(201).json({ status: true, data: { message: "6 digit verification code has been sent to your email successfully" } });
@@ -84,23 +86,23 @@ class AuthController{
         }
         const {email, password} = req.body
         const user = await UserModel.findOne({ email });
-        if (!user) return res.status(STATUS_CODE_NOT_FOUND).json({status:false,data:{message:UserEmailNotFoundMessage}});
-        if (!(await bcrypt.compare(password, user.password))) return res.status(STATUS_CODE_NOT_FOUND).json({status:false, data:{message:UserEmailNotFoundMessage}});
-        if(user.verified==false){
-          let code = generateNumericOTP(6)
-          const msg = {
-            from: '"From IReach"',
-            to: `${user.email}`, 
-            subject: 'Verification Code',
-            html: `<h2>Dear User your verification code:${code}</h2>`,
-          }
-          const mail = await SendMail(msg);
-          if (mail.messageId){
-            user.code = code
-             await user.save()
-             return res.status(400).json({status:false, data:{message:"your account is not verified 6 digit verification code has been resent to your email successfully"}});
-          }
-        }
+        if (!user) return res.status(STATUS_CODE_NOT_FOUND).json({status:false,data:{message:"user already exist"}});
+        if (!(await bcrypt.compare(password, user.password))) return res.status(STATUS_CODE_NOT_FOUND).json({status:false, data:{message:"invalid credentials"}});
+        // if(user.verified==false){
+        //   let code = generateNumericOTP(6)
+        //   const msg = {
+        //     from: '"From IReach"',
+        //     to: `${user.email}`, 
+        //     subject: 'Verification Code',
+        //     html: `<h2>Dear User your verification code:${code}</h2>`,
+        //   }
+         // const mail = await SendMail(msg);
+        //   if (mail.messageId){
+        //     user.code = code
+        //      await user.save()
+        //      return res.status(400).json({status:false, data:{message:"your account is not verified 6 digit verification code has been resent to your email successfully"}});
+        //   }
+        //}
     
        return res.status(200).json({status:true,data:{message:"user login successfull",user:generateToken(user)}})
       } catch (error) {
@@ -112,16 +114,16 @@ class AuthController{
       try {
       const {email} = req.body
       const user = await UserModel.findOne({ email });
-      let code = generateNumericOTP(6)
+      let v_code = generateNumericOTP(6)
       const msg = {
         from: '"From IReach"',
         to: `${user.email}`, 
         subject: 'Verification Code',
-        html: `<h2>Dear User your verification code:${code}</h2>`,
+        html: `<h2>Dear User your verification code:${v_code}</h2>`,
       }
       const mail = await SendMail(msg);
       if (mail.messageId){
-        user.code = code
+        user.v_code = v_code
          await user.save()
          return res.status(200).json({status:true, data:{message:"6 digit verification code has been resent to your email successfully"}});
       }
@@ -140,11 +142,11 @@ class AuthController{
           return res.status(400).json({status:false,data:{message:error.message}});
         }
        
-      const {email,code} = req.body
+      const {email,v_code} = req.body
       const user = await UserModel.findOne({ email });
       if (!user) return res.status(404).json({status:false, data:{message:"user not found"}});
-      if (user.code !== code)return res.status(400).json({status:false, data:{message:"verification code is incorrect"}})
-      user.code= '';
+      if (user.v_code !== code)return res.status(400).json({status:false, data:{message:"verification code is incorrect"}})
+      user.v_code= '';
       user.verified=true;
       await user.save();
       return res.status(200).json({status:true, data:{message:"code verified successfully"}});

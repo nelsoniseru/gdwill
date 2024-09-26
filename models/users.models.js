@@ -12,9 +12,14 @@ const userSchema = new mongoose.Schema({
     pin:String,
     phone:String,
     proof_of_identity:{nin:String,bvn:Number},
-    pwd:String,
-    ref_code:String,
+    password:String,
+    v_code:String,
     img:String,
+    verified: { 
+        type: Boolean,
+        enum: [true,false,],
+        default:false,
+        },
     role: { 
         type: String,
         enum: ["ADMIN","REALTOR","BUYER_INVESTOR"],
@@ -25,7 +30,7 @@ const userSchema = new mongoose.Schema({
 });
   
 const User = mongoose.model('User', userSchema);
-User.find().then(e=>{
-    console.log(e)
-})
+// User.deleteMany().then(e=>{
+//     console.log(e)
+// })
 module.exports = User
