@@ -4,11 +4,20 @@ const bcrypt = require("bcryptjs")
 const cloudinary = require("../utils/cloudinary")
 const {SendMail} = require("../utils/email")
 const {generateToken} = require("../middleware/auth.middleware")
+
 const {
     validateUserRegisterInput, 
     validateUserLoginInput,
-    validateOtpInput
+    validateOtpInput,
+    validateVEmailInput,
+    validateResetPasswordInput
     } = require('../validator/validator')
+    const path = require("path")
+    const { sendEmailWithTemplate } = require('../utils/sendTemp');
+    const templatePath = path.join(__dirname, '../utils/ireach.html');
+    
+  
+  
 
 class AuthController{
     async Register(req, res) {
@@ -52,23 +61,23 @@ class AuthController{
       
           // Generate OTP code
           let v_code = generateNumericOTP(6);
-      
-          // Prepare the email message
-          const msg = {
-            from: '"From IReach"',
-            to: email,
-            subject: 'Verification Code',
-            html: `<h2>Dear User, your verification code: ${v_code} </h2>`,
+          const replacements = {
+            last_name: last_name,
+            v_code: v_code
           };
-      
-          // Send verification email
-          const mail = await SendMail(msg);
-          if (mail.messageId) {
+          
+          // Prepare the email message
+          sendEmailWithTemplate(email,'','Verification Code', templatePath, replacements)
+          .then(async (response) => {
             newUser.v_code = v_code;
             await newUser.save();
-      
+            console.log('Email sent successfully:', response);
+
             return res.status(201).json({ status: true, data: { message: "6 digit verification code has been sent to your email successfully" } });
-          }
+          })
+          .catch(error => {
+            console.error('Error sending email:', error);
+          })           
       
         } catch (error) {
           console.error(error);
@@ -116,18 +125,21 @@ class AuthController{
       const {email} = req.body
       const user = await UserModel.findOne({ email });
       let v_code = generateNumericOTP(6)
-      const msg = {
-        from: '"From IReach"',
-        to: `${user.email}`, 
-        subject: 'Verification Code',
-        html: `<h2>Dear User your verification code:${v_code}</h2>`,
-      }
-      const mail = await SendMail(msg);
-      if (mail.messageId){
-        user.v_code = v_code
-         await user.save()
-         return res.status(200).json({status:true, data:{message:"6 digit verification code has been resent to your email successfully"}});
-      }
+      const replacements = {
+        last_name: last_name,
+        v_code: v_code
+      };
+      sendEmailWithTemplate(email,'','Verification Code', templatePath, replacements)
+      .then(async (response) => {
+        newUser.v_code = v_code;
+        await newUser.save();
+        console.log('Email sent successfully:', response);
+
+        return res.status(201).json({ status: true, data: { message: "6 digit verification code has been sent to your email successfully" } });
+      })
+      .catch(error => {
+        console.error('Error sending email:', error);
+      }) 
       } catch (error) {
         throw new Error(error);
       }
@@ -166,11 +178,13 @@ class AuthController{
         if (error) {
           return res.status(400).json({status:false,data:{message:error.message}});
         }
-          const {email,password} = req.body
+          const {email,new_password, c_password} = req.body
+
         const user = await UserModel.findOne({ email });
         if (!user) return res.status(404).json({status:false, data:{message:"user not found"}});
-        const hash = await hashPassword(password)
-        user.password =String(hash)
+        if(new_password !== c_password) return res.status(400).json({status:false, data:{message:"password does not match"}})
+        const hash = await hashPassword(new_password)
+        user.password = hash
         await user.save();
         return res.status(200).json({status:true, data:{message:"password reset successfully"}});
       } catch (err) {
@@ -227,24 +241,32 @@ class AuthController{
     async postVerifyMail(req,res) {
     
       try {
+        const { error } = validateVEmailInput.validate(req.body);
+        if (error) {
+          return res.status(400).json({status:false,data:{message:error.message}});
+        }
         const {email} = req.body
+
         const user = await UserModel.findOne({ email });
         if (!user) return res.status(404).json({status:false, data:{message:"user not found"}});
-        let code = generateNumericOTP(6)
-        const msg = {
-            from: '"From IReach"',
-          to: `${email}`, 
-          subject: 'Forgot Password',
-          html: `<h2>Dear User your otp:${code} </h2>`,
-        }
-        
-        // Send the email
-        const mail = await SendMail(msg);
-        if (mail.messageId) {
-           user.code = code
-           await user.save()
-           return res.status(200).json({status:true, data:{message:"An otp has been sent to your email successfully"}});
-        }
+        let v_code = generateNumericOTP(6)
+    
+        const replacements = {
+          last_name: user.last_name,
+          v_code: v_code
+        };
+
+        sendEmailWithTemplate(email,'','Forgot Password', templatePath, replacements)
+        .then(async (response) => {
+          user.v_code = v_code;
+          await user.save();
+          console.log('Email sent successfully:', response);
+
+          return res.status(201).json({ status: true, data: { message: "6 digit verification code has been sent to your email successfully" } });
+        })
+        .catch(error => {
+          console.error('Error sending email:', error);
+        }) 
       } catch (err) {
         throw new Error(err);
       }

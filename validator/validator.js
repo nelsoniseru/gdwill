@@ -3,6 +3,9 @@ const validateUserLoginInput = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
   });
+  const validateVEmailInput = Joi.object({
+    email: Joi.string().email().required(),
+  })
 
 const validateUserRegisterInput = Joi.object({
     first_name: Joi.string().required(),
@@ -32,7 +35,8 @@ const validateUserRegisterInput = Joi.object({
     });
 const validateResetPasswordInput = Joi.object({
     email: Joi.any().strip(),
-    password: Joi.string()
+     c_password:Joi.string().required(),
+     new_password: Joi.string()
       .min(8).required().messages({
         'string.min': 'password must be at least 8 characters long',
         'any.required': 'password is required'
@@ -64,6 +68,7 @@ const validateResetPasswordInput = Joi.object({
    module.exports =  {
   validateUserLoginInput,
   validateUserRegisterInput,
-  validateOtpInput
- 
+  validateOtpInput,
+  validateVEmailInput,
+  validateResetPasswordInput
 };
