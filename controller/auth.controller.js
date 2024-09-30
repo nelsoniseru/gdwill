@@ -96,8 +96,8 @@ class AuthController{
         }
         const {email, password} = req.body
         const user = await UserModel.findOne({ email });
-        if (!user) return res.status(STATUS_CODE_NOT_FOUND).json({status:false,data:{message:"user already exist"}});
-        if (!(await bcrypt.compare(password, user.password))) return res.status(STATUS_CODE_NOT_FOUND).json({status:false, data:{message:"invalid credentials"}});
+        if (!user) return res.status(400).json({status:false,data:{message:"user already exist"}});
+        if (!(await bcrypt.compare(password, user.password))) return res.status(400).json({status:false, data:{message:"invalid credentials"}});
         // if(user.verified==false){
         //   let code = generateNumericOTP(6)
         //   const msg = {
