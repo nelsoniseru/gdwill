@@ -7,7 +7,8 @@ const {
     validateUserLoginInput,
     validateOtpInput,
     validateVEmailInput,
-    validateResetPasswordInput
+    validateResetPasswordInput,
+    propertyValidationSchema
     } = require('../validator/validator')
     const path = require("path")
     const { sendEmailWithTemplate } = require('../utils/sendTemp');
@@ -19,11 +20,14 @@ const {
 class PropertyController{
     
 async addProperty(req, res) {
-
 try {
     // Validate incoming data
-    const validatedData = validateProperty(req.body);
-
+    console.log(req.user)
+    const { error } = propertyValidationSchema.validate(req.body);      
+          // If validation fails, return an error response
+          if (error) {
+            return res.status(400).json({ status: false, data: { message: error.details[0].message } });
+          }
     // Handle image uploads to Cloudinary
     const imageUploadPromises = req.files.map(file => {
         return cloudinary.uploader.upload(file.path);
@@ -31,16 +35,18 @@ try {
 
     // Wait for all images to be uploaded
     const imageUploadResults = await Promise.all(imageUploadPromises);
-    const imageUrls = imageUploadResults.map(result => result.secure_url);
-
+    const imageUrls = imageUploadResults.map(result => ({ img: result.secure_url }));
     // Save `validatedData` and `imageUrls` to your database (mock saving here)
     // You should replace this with actual database logic
     const property = {
         ...validatedData,
         images: imageUrls,
-        user:req.uaer.id
+        user:req.user.id,
+        state:"publish",
+        investment: JSON.parse(req.body.investment)
     };
-     await Property.create(property)
+    let n = await Property.create(property)
+    console.log(n)
     // Respond with success
     return res.status(201).json({
         message: 'Property created successfully',

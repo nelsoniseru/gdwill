@@ -15,6 +15,7 @@ const {
     const path = require("path")
     const { sendEmailWithTemplate } = require('../utils/sendTemp');
     const templatePath = path.join(__dirname, '../utils/ireach.html');
+    const templatePath2 = path.join(__dirname, '../utils/forgotpassword.html');
     
   
   
@@ -40,11 +41,7 @@ class AuthController{
           // Hash the password
           const hash = await hashPassword(password);
       
-          // If an image is provided, upload it to Cloudinary
-            const result = await cloudinary.uploader.upload(req.file.path, {
-              folder: "users", 
-            });
-  
+      
           
       
           // Create a new user
@@ -56,7 +53,7 @@ class AuthController{
             phone,
             gender,
             password: hash,
-            img:result.secure_url,  
+            img,  
           });
       
           // Generate OTP code
@@ -256,7 +253,7 @@ class AuthController{
           v_code: v_code
         };
 
-        sendEmailWithTemplate(email,'','Forgot Password', templatePath, replacements)
+        sendEmailWithTemplate(email,'','Forgot Password', templatePath2, replacements)
         .then(async (response) => {
           user.v_code = v_code;
           await user.save();
