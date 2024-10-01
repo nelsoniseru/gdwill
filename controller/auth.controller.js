@@ -30,7 +30,7 @@ class AuthController{
             return res.status(400).json({ status: false, data: { message: error.details[0].message } });
           }
       
-          const { email, password, first_name,dob,gender,phone, last_name, img } = req.body;
+          const { email, password, first_name,dob,gender,phone, last_name, img,referralCode } = req.body;
       
           // Check if the email already exists
           const emailExist = await UserModel.findOne({ email });
@@ -40,10 +40,6 @@ class AuthController{
       
           // Hash the password
           const hash = await hashPassword(password);
-      
-      
-          
-      
           // Create a new user
           const newUser = await UserModel.create({
             email,
@@ -54,6 +50,7 @@ class AuthController{
             gender,
             password: hash,
             img,  
+            referralCode
           });
       
           // Generate OTP code

@@ -12,6 +12,7 @@ const validateUserRegisterInput = Joi.object({
     last_name: Joi.string().required(),
     email: Joi.string().email().required(),
     img: Joi.string().allow(),
+    referralCode: Joi.string().allow(),
     dob: Joi.date().required(),
     gender: Joi.string().required(),
     phone: Joi.string().required(),
