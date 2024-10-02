@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
     password:String,
     v_code:String,
     img:String,
+    referralCode:String,
     verified: { 
         type: Boolean,
         enum: [true,false,],
