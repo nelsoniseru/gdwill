@@ -16,6 +16,7 @@ const {
     const { sendEmailWithTemplate } = require('../utils/sendTemp');
     const templatePath = path.join(__dirname, '../utils/ireach.html');
     const templatePath2 = path.join(__dirname, '../utils/forgotpassword.html');
+    const templatePath3 = path.join(__dirname, '../utils/resend.html');
     
   
   
@@ -123,10 +124,10 @@ class AuthController{
         last_name: last_name,
         v_code: v_code
       };
-      sendEmailWithTemplate(email,'','Verification Code', templatePath, replacements)
+      sendEmailWithTemplate(email,'','Resend Verification Code', templatePath3, replacements)
       .then(async (response) => {
-        newUser.v_code = v_code;
-        await newUser.save();
+        user.v_code = v_code;
+        await user.save();
         console.log('Email sent successfully:', response);
 
         return res.status(201).json({ status: true, data: { message: "6 digit verification code has been sent to your email successfully" } });
