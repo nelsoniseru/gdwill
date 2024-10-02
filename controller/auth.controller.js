@@ -121,7 +121,7 @@ class AuthController{
       const user = await UserModel.findOne({ email });
       let v_code = generateNumericOTP(6)
       const replacements = {
-        last_name: last_name,
+        last_name: user.last_name,
         v_code: v_code
       };
       sendEmailWithTemplate(email,'','Resend Verification Code', templatePath3, replacements)

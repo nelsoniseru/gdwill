@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
 });
   
 const User = mongoose.model('User', userSchema);
-// User.deleteMany().then(e=>{
-//     console.log(e)
-// })
+User.find().then(e=>{
+    console.log(e)
+})
 module.exports = User
