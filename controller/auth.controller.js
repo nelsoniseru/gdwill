@@ -119,6 +119,7 @@ class AuthController{
       try {
       const {email} = req.body
       const user = await UserModel.findOne({ email });
+      if (!user) return res.status(404).json({status:false, data:{message:"user not found"}});
       let v_code = generateNumericOTP(6)
       const replacements = {
         last_name: user.last_name,
