@@ -4,13 +4,15 @@ const bcrypt = require("bcryptjs")
 const cloudinary = require("../utils/cloudinary")
 const {SendMail} = require("../utils/email")
 const {generateToken} = require("../middleware/auth.middleware")
+const {verifyBvn,getBanks, resolveAccountNumber,getBankCodeByName} = require("../utils/axiosCall")
 
 const {
     validateUserRegisterInput, 
     validateUserLoginInput,
     validateOtpInput,
     validateVEmailInput,
-    validateResetPasswordInput
+    validateResetPasswordInput,
+    validatePinInput
     } = require('../validator/validator')
     const path = require("path")
     const { sendEmailWithTemplate } = require('../utils/sendTemp');
@@ -31,7 +33,7 @@ class AuthController{
             return res.status(400).json({ status: false, data: { message: error.details[0].message } });
           }
       
-          const { email, password, first_name,dob,gender,phone, last_name, img,referralCode } = req.body;
+          const { email, password, first_name,dob,gender,phone,role,last_name, img,referralCode } = req.body;
       
           // Check if the email already exists
           const emailExist = await UserModel.findOne({ email });
@@ -51,6 +53,7 @@ class AuthController{
             gender,
             password: hash,
             img,  
+            role,
             referralCode
           });
       
@@ -81,39 +84,57 @@ class AuthController{
       
     }
     
-    async Login(req,res){
+    async Login(req, res) {
       try {
         const { error } = validateUserLoginInput.validate(req.body);
     
         // If validation fails, return an error response
         if (error) {
-          return res.status(400).json({status:false,data:{message:error.details[0].message}});
+          return res.status(400).json({ status: false, data: { message: error.details[0].message } });
         }
-        const {email, password} = req.body
+    
+        const { email, password, pin } = req.body;
+    
+        // Find the user by email
         const user = await UserModel.findOne({ email });
-        if (!user) return res.status(400).json({status:false,data:{message:"user already exist"}});
-        if (!(await bcrypt.compare(password, user.password))) return res.status(400).json({status:false, data:{message:"invalid credentials"}});
-        // if(user.verified==false){
-        //   let code = generateNumericOTP(6)
+        if (!user) {
+          return res.status(400).json({ status: false, data: { message: "User does not exist." } });
+        }
+    
+        // Check for password if provided
+        const passwordMatch = password && await bcrypt.compare(password, user.password);
+        
+        // Check for PIN if provided
+        const pinMatch = pin && await bcrypt.compare(pin, user.pin ); // Assuming you store the pin in a plain format or hashed. If hashed, use bcrypt.compare()
+    
+        // Check if either the password or the PIN is correct
+        if (!passwordMatch && !pinMatch) {
+          return res.status(400).json({ status: false, data: { message: "Invalid credentials." } });
+        }
+    
+        // Uncomment and handle the verification logic if needed
+        // if (user.verified == false) {
+        //   let code = generateNumericOTP(6);
         //   const msg = {
         //     from: '"From IReach"',
-        //     to: `${user.email}`, 
+        //     to: `${user.email}`,
         //     subject: 'Verification Code',
-        //     html: `<h2>Dear User your verification code:${code}</h2>`,
+        //     html: `<h2>Dear User your verification code: ${code}</h2>`,
+        //   };
+        //   const mail = await SendMail(msg);
+        //   if (mail.messageId) {
+        //     user.code = code;
+        //     await user.save();
+        //     return res.status(400).json({ status: false, data: { message: "Your account is not verified. A 6-digit verification code has been resent to your email successfully." } });
         //   }
-         // const mail = await SendMail(msg);
-        //   if (mail.messageId){
-        //     user.code = code
-        //      await user.save()
-        //      return res.status(400).json({status:false, data:{message:"your account is not verified 6 digit verification code has been resent to your email successfully"}});
-        //   }
-        //}
+        // }
     
-       return res.status(200).json({status:true,data:{message:"user login successfull",user:generateToken(user)}})
+        return res.status(200).json({ status: true, data: { message: "User login successful", user: generateToken(user) } });
       } catch (error) {
-        throw new Error(error);
-      }  
+        return res.status(500).json({ status: false, data: { message: error.message } });
+      }
     }
+    
     
     async PostResend(req,res){
       try {
@@ -269,5 +290,88 @@ class AuthController{
     
      
     }
+
+    async postVerifyBvn(req,res) {
+      try {
+        const {email, bvn } = req.body;
+
+        if (!bvn) {
+            return res.status(400).json({ message: 'BVN is required' });
+        }
+        try {
+           // const result = await verifyBvn(bvn);
+            let foundUser = await UserModel.findOne({email:req.body.email})
+            if(!foundUser) return res.status(400).json({ status: false, data: { message: "user not found"} });    
+            foundUser.proof_of_identity = bvn
+            await foundUser.save()
+              return res.status(200).json({ status:true, data:{message:"bvn saved successfully"}});
+        } catch (error) {
+            return res.status(500).json({ status: false, data:{message: error.message} });
+        }
+      } catch (err) {
+        console.log(error)
+        throw new Error(err);
+      }
+    
+     
+    }
+    async getAllBanks(req,res) {
+      try {
+          const result = await getBanks();
+          return res.status(200).json({ status:true, data:{result}});
+     
+    } catch (err) {
+      throw new Error(err);
+    }
+  
+   
+  }
+
+
+  async resolveAccount(req,res){
+    const { bankName, accountNumber,email } = req.body;
+
+    if (!bankName || !accountNumber) {
+        return res.status(400).json({ error: 'Bank name and account number are required.' });
+    }
+
+    try {
+        // Get the bank code using the bank name
+        let foundUser = await UserModel.findOne({email:req.body.email})
+        if(!foundUser) return res.status(400).json({ status: false, data: { message: "user not found"} });   
+        const bankCode = await getBankCodeByName(bankName);
+
+        if (!bankCode) {
+            return res.status(404).json({ error: 'Bank not found.' });
+        }
+
+        // Resolve account number using Paystack's API
+        const accountDetails = await resolveAccountNumber(accountNumber, bankCode);
+
+        return res.json({
+            success: true,
+            message: 'Account details retrieved successfully.',
+            data: accountDetails,
+        });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+  }
+  async savePin(req,res){
+    const { error } = validatePinInput.validate(req.body);
+    console.log(req.body.email)
+    if (error) {
+      return res.status(400).json({status:false,data:{message:error.details[0].message}});
+    }
+    let foundUser = await UserModel.findOne({email:req.body.email})
+    if(!foundUser) return res.status(400).json({ status: false, data: { message: "user not found"} });
+    const hash = await hashPassword(req.body.pin);
+   foundUser.pin = hash
+   await foundUser.save()
+   return res.status(200).json({status:true, data:{message:"pin created successfully"}})
+  }
 }
+
+
+//22276690228
  module.exports = new AuthController()

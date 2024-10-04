@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     dob:Date,
     pin:String,
     phone:String,
-    proof_of_identity:{nin:String,bvn:Number},
+    proof_of_identity:{bank_name:String,bank_number:String,bvn:Number},
     password:String,
     v_code:String,
     img:String,
@@ -23,15 +23,14 @@ const userSchema = new mongoose.Schema({
         },
     role: { 
         type: String,
-        enum: ["ADMIN","REALTOR","BUYER_INVESTOR"],
-        default:"BUYER_INVESTOR",
+        enum: ["admin","realtor","buyer_investor"],
         },
   },{
     timestamps:true
 });
   
 const User = mongoose.model('User', userSchema);
-User.find().then(e=>{
-    console.log(e)
-})
+// User.find().then(e=>{
+//     console.log(e)
+// })
 module.exports = User

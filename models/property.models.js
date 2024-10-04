@@ -47,10 +47,8 @@ const propertySchema = new mongoose.Schema({
               }
             }
           ],
-        price:{price_per_plot:Number,initial_price:Number},
-        property_size:{
-            type: Number,
-        },
+        property_module:{price_per_plot:Number,initial_price:Number,property_size:Number},
+    
         purchase:{
             purchase_type:{
                 type: String,

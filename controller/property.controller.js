@@ -22,35 +22,22 @@ class PropertyController{
 async addProperty(req, res) {
 try {
     // Validate incoming data
-    console.log(req.user)
     const { error } = propertyValidationSchema.validate(req.body);      
           // If validation fails, return an error response
           if (error) {
             return res.status(400).json({ status: false, data: { message: error.details[0].message } });
-          }
-    // Handle image uploads to Cloudinary
-    const imageUploadPromises = req.files.map(file => {
-        return cloudinary.uploader.upload(file.path);
-    });
-
-    // Wait for all images to be uploaded
-    const imageUploadResults = await Promise.all(imageUploadPromises);
-    const imageUrls = imageUploadResults.map(result => ({ img: result.secure_url }));
-    // Save `validatedData` and `imageUrls` to your database (mock saving here)
-    // You should replace this with actual database logic
+          }  
     const property = {
-        ...validatedData,
-        images: imageUrls,
+        ...req.body,
         user:req.user.id,
         state:"publish",
-        investment: JSON.parse(req.body.investment)
+        investment: req.body.investment
     };
-    let n = await Property.create(property)
-    console.log(n)
+    let newProp = await Property.create(property)
     // Respond with success
     return res.status(201).json({
+        data:newProp,
         message: 'Property created successfully',
-        property,
     });
 } catch (error) {
     return res.status(400).json({ error: error.message });
@@ -59,74 +46,76 @@ try {
 
 async getProperties(req, res) {
     try {
-      const properties = await PropertyModel.find();
-      return res.status(200).json(properties);
+      const type = req.query.type
+      const properties = await Property.find({property_type:type});
+      return res.status(200).json({success:true,data:{ properties}});
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(400).json({ success:false, data:{message: error.message}});
     }
   }
 
   // Get Property by ID
   async getPropertyById(req, res) {
     try {
-      const property = await PropertyModel.findById(req.params.id);
+      const property = await Property.findById(req.params.id);
       if (!property) {
-        return res.status(404).json({ error: 'Property not found' });
+        return res.status(404).json({ success:false, data:{message: 'Property not found'}});
       }
-      return res.status(200).json(property);
+      return res.status(200).json({success:true,data:{property}});
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(400).json({ success:false, data:{message: error.message}});
     }
   }
 
   // Update Property by ID
   async updateProperty(req, res) {
     try {
-      const validatedData = validateProperty(req.body);
-
-      // If new images are uploaded, handle image uploads to Cloudinary
-      let imageUrls = [];
-      if (req.files && req.files.length > 0) {
-        const imageUploadPromises = req.files.map(file => {
-          return cloudinary.uploader.upload(file.path);
-        });
-        const imageUploadResults = await Promise.all(imageUploadPromises);
-        imageUrls = imageUploadResults.map(result => result.secure_url);
-      }
+      const { error } = propertyValidationSchema.validate(req.body);      
+      // If validation fails, return an error response
+      if (error) {
+        return res.status(400).json({ status: false, data: { message: error.details[0].message } });
+      }  
 
       // Update the property data
-      const updatedProperty = await PropertyModel.updateOne(
-        req.params.id,
-        { ...validatedData, ...(imageUrls.length > 0 && { images: imageUrls }) },
+      const updatedProperty = await Property.updateOne(
+        {_id:req.params.id},
+        { ...req.body},
         { new: true }
       );
 
       if (!updatedProperty) {
-        return res.status(404).json({ error: 'Property not found' });
+        return res.status(404).json({ success:false, data:{message: 'Property not found'}});
       }
 
       return res.status(200).json({
+        success:true,
+        data:{
         message: 'Property updated successfully',
         property: updatedProperty,
+        }
       });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ success:false, data:{message: error.message}});
+
     }
   }
 
   // Delete Property by ID
   async deleteProperty(req, res) {
     try {
-      const deletedProperty = await PropertyModel.findByIdAndDelete(req.params.id);
+      const deletedProperty = await Property.deleteOne({_id:req.params.id});
       if (!deletedProperty) {
-        return res.status(404).json({ error: 'Property not found' });
+        return res.status(404).json({ success:false, data:{message: 'Property not found'}});
       }
 
       return res.status(200).json({
+        success:true,
+        data:{
         message: 'Property deleted successfully',
+        }
       });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(400).json({ success:false, data:{message: error.message}});
     }
   }
 }

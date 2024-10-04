@@ -19,5 +19,9 @@ router.post("/verify-email",authController.postVerifyMail)
 router.put("/reset-password",authController.postResetPassword)
 router.put("/profile-edit",authMiddleWare,authController.postEditProfile)
 router.put("/password-edit",authMiddleWare,authController.passwordEdit)
+router.post("/verify-bvn",authController.postVerifyBvn)
+router.get("/all-banks",authController.getAllBanks)
+router.post("/resolve",authController.resolveAccount)
+router.post("/save-pin",authController.savePin)
 
 module.exports = router;

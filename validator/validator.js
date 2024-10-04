@@ -1,8 +1,29 @@
 const  Joi = require('joi');
 const validateUserLoginInput = Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-  });
+  email: Joi.string().email().required(),
+  password: Joi.string().optional(),  // Optional to allow PIN only
+  pin: Joi.string()
+    .pattern(/^[0-9]{4}$/) // Ensure the PIN is exactly 6 digits
+    .optional() // Optional to allow password only
+}).custom((value, helpers) => {
+  // Custom validation to enforce only one of password or pin is provided
+  const { password, pin } = value;
+
+  if (!password && !pin) {
+    return helpers.error('any.required'); // No password or PIN provided
+  }
+
+  if (password && pin) {
+    return helpers.error('object.unknown'); // Both password and PIN provided
+  }
+
+  return value; // Return the value if validation is successful
+}).messages({
+  'any.required': 'Either password or PIN is required.',
+  'object.unknown': 'Only one of password or PIN should be provided.',
+  'string.pattern.base': 'PIN must be exactly 4 digits and contain only numbers.'
+});
+
   const validateVEmailInput = Joi.object({
     email: Joi.string().email().required(),
   })
@@ -10,6 +31,7 @@ const validateUserLoginInput = Joi.object({
 const validateUserRegisterInput = Joi.object({
     first_name: Joi.string().required(),
     last_name: Joi.string().required(),
+    role:Joi.string().required(),
     email: Joi.string().email().required(),
     img: Joi.string().allow(),
     referralCode: Joi.string().allow(),
@@ -76,11 +98,12 @@ const validateResetPasswordInput = Joi.object({
           property_features: Joi.array().items(Joi.object({
               property_features: Joi.string().allow(null, '')   // Optional string
           })).allow(null),   // Optional array of features
-          price: Joi.object({
+          property_module: Joi.object({
               price_per_plot: Joi.number().allow(null),
-              initial_price: Joi.number().allow(null)
+              initial_price: Joi.number().allow(null),
+              property_size: Joi.number().allow(null)
           }).allow(null),
-          property_size: Joi.number().allow(null),
+    
           purchase: Joi.object({
               purchase_type: Joi.string().valid('installment', 'one_time').allow(null),
               duration: Joi.number().allow(null)
@@ -98,6 +121,19 @@ const validateResetPasswordInput = Joi.object({
         .min(6)
         .max(6)
       })
+
+
+    const validatePinInput = Joi.object({
+      email: Joi.any().strip(),
+      pin: Joi.string()
+      .pattern(/^[0-9]{4}$/) 
+      .required()
+      .messages({
+        'string.pattern.base': 'Pin must be exactly 4 digits and contain only numbers.',
+        'string.empty': 'Pin is required.',
+        'any.required': 'Pin is required.',
+      })
+      })
     
  
 
@@ -107,5 +143,6 @@ const validateResetPasswordInput = Joi.object({
   validateOtpInput,
   validateVEmailInput,
   validateResetPasswordInput,
-  propertyValidationSchema
+  propertyValidationSchema,
+  validatePinInput
 };
