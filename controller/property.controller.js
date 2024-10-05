@@ -1,7 +1,7 @@
 const {hashPassword,generateNumericOTP,isAdmin} = require("../utils/helperFunc")
 const Property = require("../models/property.models")
 const cloudinary = require("../utils/cloudinary")
-const {h } = require("../utils/helperFunc")
+const UserModel = require("../models/users.models")
 
 const {
  
@@ -18,7 +18,8 @@ class PropertyController{
     
 async addProperty(req, res) {
 try {
-  let  is_admin = await isAdmin(req.user.id)
+  let is_admin = await isAdmin(req.user.id)
+ if(!await UserModel.findOne(({_id:req.user.id})))return res.status(400).json({ success:false, data:{message: "user not found"}});
   if(!is_admin)return res.status(400).json({ success:false, data:{message: "only admin can perform this operation"}});
     const { error } = propertyValidationSchema.validate(req.body);      
           // If validation fails, return an error response
@@ -49,6 +50,7 @@ async getProperties(req, res) {
     try {
       const type = req.query.type
       let  is_admin = await isAdmin(req.user.id)
+      if(!await UserModel.findOne(({_id:req.user.id})))return res.status(400).json({ success:false, data:{message: "user not found"}});
       if(!is_admin)return res.status(400).json({ success:false, data:{message: "only admin can perform this operation"}});
       const properties = await Property.find({property_type:type});
       return res.status(200).json({success:true,data:{ properties}});
@@ -61,6 +63,7 @@ async getProperties(req, res) {
   async getPropertyById(req, res) {
     try {
       let  is_admin = await isAdmin(req.user.id)
+      if(!await UserModel.findOne(({_id:req.user.id})))return res.status(400).json({ success:false, data:{message: "user not found"}});
       if(!is_admin)return res.status(400).json({ success:false, data:{message: "only admin can perform this operation"}});
       const property = await Property.findById(req.params.id);
 
@@ -78,6 +81,7 @@ async getProperties(req, res) {
   async updateProperty(req, res) {
     try {
       let  is_admin = await isAdmin(req.user.id)
+      if(!await UserModel.findOne(({_id:req.user.id})))return res.status(400).json({ success:false, data:{message: "user not found"}});
       if(!is_admin)return res.status(400).json({ success:false, data:{message: "only admin can perform this operation"}});
       const { error } = propertyValidationSchema.validate(req.body);      
       // If validation fails, return an error response
@@ -113,6 +117,7 @@ async getProperties(req, res) {
   async deleteProperty(req, res) {
     try {
       let  is_admin = await isAdmin(req.user.id)
+      if(!await UserModel.findOne(({_id:req.user.id})))return res.status(400).json({ success:false, data:{message: "user not found"}});
       if(!is_admin)return res.status(400).json({ success:false, data:{message: "only admin can perform this operation"}});
       const deletedProperty = await Property.deleteOne({_id:req.params.id});
 
