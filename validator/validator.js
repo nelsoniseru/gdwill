@@ -134,8 +134,32 @@ const validateResetPasswordInput = Joi.object({
         'any.required': 'Pin is required.',
       })
       })
-    
- 
+
+      const validateBvnInput = Joi.object({
+        email: Joi.any().strip(),
+        bvn: Joi.string()
+        .pattern(/^[0-9]{11}$/) 
+        .required()
+        .messages({
+          'string.pattern.base': 'BVN must be exactly 11 digits and contain only numbers.',
+          'string.empty': 'Pin is required.',
+          'any.required': 'Pin is required.',
+        })
+        })
+      
+       
+        const  validateAccountInput = Joi.object({
+         email: Joi.any().strip(),
+         bankName: Joi.string().required(),  
+         accountNumber: Joi.string()
+          .pattern(/^[0-9]{10}$/) 
+          .required()
+          .messages({
+            'string.pattern.base': 'Bank name must be exactly 10 digits and contain only numbers.',
+            'string.empty': 'Pin is required.',
+            'any.required': 'Pin is required.',
+          })
+          })
 
    module.exports =  {
   validateUserLoginInput,
@@ -144,5 +168,7 @@ const validateResetPasswordInput = Joi.object({
   validateVEmailInput,
   validateResetPasswordInput,
   propertyValidationSchema,
-  validatePinInput
+  validatePinInput,
+  validateBvnInput,
+  validateAccountInput
 };

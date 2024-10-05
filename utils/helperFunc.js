@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const UserModel = require("../models/users.models")
 
 const hashPassword = async (password) => {
     const saltRounds = 10;
@@ -23,7 +24,14 @@ const hashPassword = async (password) => {
     }
     return otp;
   };
+
+  const isAdmin = async(email) => {
+    let user =  await UserModel.findOne({email})
+    let is_Admin  = user.role == "admin"? true : false
+    return is_Admin ;
+  };
   module.exports  =  {
     hashPassword,
-    generateNumericOTP
+    generateNumericOTP,
+    isAdmin 
   }

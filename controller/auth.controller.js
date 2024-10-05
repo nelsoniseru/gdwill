@@ -12,7 +12,9 @@ const {
     validateOtpInput,
     validateVEmailInput,
     validateResetPasswordInput,
-    validatePinInput
+    validatePinInput,
+    validateBvnInput,
+    validateAccountInput
     } = require('../validator/validator')
     const path = require("path")
     const { sendEmailWithTemplate } = require('../utils/sendTemp');
@@ -293,6 +295,11 @@ class AuthController{
 
     async postVerifyBvn(req,res) {
       try {
+        
+        const { error } = validateBvnInput.validate(req.body);
+        if (error) {
+          return res.status(400).json({status:false,data:{message:error.message}});
+        }
         const {email, bvn } = req.body;
 
         if (!bvn) {
@@ -302,7 +309,7 @@ class AuthController{
            // const result = await verifyBvn(bvn);
             let foundUser = await UserModel.findOne({email:req.body.email})
             if(!foundUser) return res.status(400).json({ status: false, data: { message: "user not found"} });    
-            foundUser.proof_of_identity = bvn
+            foundUser.proof_of_identity.bvn = bvn
             await foundUser.save()
               return res.status(200).json({ status:true, data:{message:"bvn saved successfully"}});
         } catch (error) {
@@ -329,6 +336,10 @@ class AuthController{
 
 
   async resolveAccount(req,res){
+    const { error } = validateAccountInput.validate(req.body);
+    if (error) {
+      return res.status(400).json({status:false,data:{message:error.message}});
+    }
     const { bankName, accountNumber,email } = req.body;
 
     if (!bankName || !accountNumber) {
@@ -337,24 +348,27 @@ class AuthController{
 
     try {
         // Get the bank code using the bank name
-        let foundUser = await UserModel.findOne({email:req.body.email})
+        let foundUser = await UserModel.findOne({email:email})
         if(!foundUser) return res.status(400).json({ status: false, data: { message: "user not found"} });   
         const bankCode = await getBankCodeByName(bankName);
 
         if (!bankCode) {
-            return res.status(404).json({ error: 'Bank not found.' });
+            return res.status(404).json({ status: false, data: { message: "bank not found"}});
         }
 
         // Resolve account number using Paystack's API
         const accountDetails = await resolveAccountNumber(accountNumber, bankCode);
-
+        foundUser.proof_of_identity.bank_name = bankName
+        foundUser.proof_of_identity.bank_number = accountNumber
+      await foundUser.save()
         return res.json({
             success: true,
             message: 'Account details retrieved successfully.',
             data: accountDetails,
         });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return res.status(400).json({status:true, data:{message:error.message }})
+
     }
   }
   async savePin(req,res){
@@ -372,6 +386,4 @@ class AuthController{
   }
 }
 
-
-//22276690228
  module.exports = new AuthController()
