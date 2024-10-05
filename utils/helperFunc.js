@@ -25,8 +25,8 @@ const hashPassword = async (password) => {
     return otp;
   };
 
-  const isAdmin = async(email) => {
-    let user =  await UserModel.findOne({email})
+  const isAdmin = async(id) => {
+    let user =  await UserModel.findOne({_id:id})
     let is_Admin  = user.role == "admin"? true : false
     return is_Admin ;
   };

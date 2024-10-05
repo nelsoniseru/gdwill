@@ -18,7 +18,7 @@ class PropertyController{
     
 async addProperty(req, res) {
 try {
-  let  is_admin = await isAdmin()
+  let  is_admin = await isAdmin(req.user.id)
   if(!is_admin)return res.status(400).json({ success:false, data:{message: "only admin can perform this operation"}});
     const { error } = propertyValidationSchema.validate(req.body);      
           // If validation fails, return an error response
@@ -48,7 +48,7 @@ try {
 async getProperties(req, res) {
     try {
       const type = req.query.type
-     let is_admin = await isAdmin()
+      let  is_admin = await isAdmin(req.user.id)
       if(!is_admin)return res.status(400).json({ success:false, data:{message: "only admin can perform this operation"}});
       const properties = await Property.find({property_type:type});
       return res.status(200).json({success:true,data:{ properties}});
@@ -60,7 +60,7 @@ async getProperties(req, res) {
   // Get Property by ID
   async getPropertyById(req, res) {
     try {
-      let is_admin = await isAdmin()
+      let  is_admin = await isAdmin(req.user.id)
       if(!is_admin)return res.status(400).json({ success:false, data:{message: "only admin can perform this operation"}});
       const property = await Property.findById(req.params.id);
 
@@ -77,7 +77,7 @@ async getProperties(req, res) {
   // Update Property by ID
   async updateProperty(req, res) {
     try {
-      let is_admin = await isAdmin()
+      let  is_admin = await isAdmin(req.user.id)
       if(!is_admin)return res.status(400).json({ success:false, data:{message: "only admin can perform this operation"}});
       const { error } = propertyValidationSchema.validate(req.body);      
       // If validation fails, return an error response
@@ -112,7 +112,7 @@ async getProperties(req, res) {
   // Delete Property by ID
   async deleteProperty(req, res) {
     try {
-      let is_admin = await isAdmin()
+      let  is_admin = await isAdmin(req.user.id)
       if(!is_admin)return res.status(400).json({ success:false, data:{message: "only admin can perform this operation"}});
       const deletedProperty = await Property.deleteOne({_id:req.params.id});
 
