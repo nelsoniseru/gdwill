@@ -14,7 +14,8 @@ const {
     validateResetPasswordInput,
     validatePinInput,
     validateBvnInput,
-    validateAccountInput
+    validateAccountInput,
+    validateNinInput
     } = require('../validator/validator')
     const path = require("path")
     const { sendEmailWithTemplate } = require('../utils/sendTemp');
@@ -365,6 +366,32 @@ class AuthController{
             success: true,
             message: 'Account details retrieved successfully.',
             data: accountDetails,
+        });
+    } catch (error) {
+        return res.status(400).json({status:true, data:{message:error.message }})
+
+    }
+  }
+
+  async setNin(req,res){
+    const { error } = validateNinInput.validate(req.body);
+    if (error) {
+      return res.status(400).json({status:false,data:{message:error.message}});
+    }
+    const { nin,email } = req.body;
+
+   
+    try {
+        let foundUser = await UserModel.findOne({email:email})
+        if(!foundUser) return res.status(400).json({ status: false, data: { message: "user not found"} });   
+
+      
+
+        foundUser.proof_of_identity.nin = nin
+      await foundUser.save()
+        return res.json({
+            success: true,
+            message: 'nin successfully.',
         });
     } catch (error) {
         return res.status(400).json({status:true, data:{message:error.message }})

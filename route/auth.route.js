@@ -23,5 +23,6 @@ router.post("/verify-bvn",authController.postVerifyBvn)
 router.get("/all-banks",authController.getAllBanks)
 router.post("/resolve",authController.resolveAccount)
 router.post("/save-pin",authController.savePin)
+router.post("/save-nin",authController.setNin)
 
 module.exports = router;

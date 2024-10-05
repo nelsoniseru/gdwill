@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     dob:Date,
     pin:String,
     phone:String,
-    proof_of_identity:{bank_name:String,bank_number:String,bvn:Number},
+    proof_of_identity:{bank_name:String,bank_number:String,bvn:Number,nin:Number},
     password:String,
     v_code:String,
     img:String,

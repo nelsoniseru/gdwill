@@ -160,6 +160,17 @@ const validateResetPasswordInput = Joi.object({
             'any.required': 'Pin is required.',
           })
           })
+          const validateNinInput= Joi.object({
+            email: Joi.any().strip(),
+            nin: Joi.string()
+             .pattern(/^[0-9]{11}$/) 
+             .required()
+             .messages({
+               'string.pattern.base': 'Nin must be exactly 11 digits and contain only numbers.',
+               'string.empty': 'Pin is required.',
+               'any.required': 'Pin is required.',
+             })
+             })
 
    module.exports =  {
   validateUserLoginInput,
@@ -170,5 +181,6 @@ const validateResetPasswordInput = Joi.object({
   propertyValidationSchema,
   validatePinInput,
   validateBvnInput,
-  validateAccountInput
+  validateAccountInput,
+  validateNinInput
 };
