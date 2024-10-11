@@ -345,7 +345,7 @@ class AuthController{
     if (error) {
       return res.status(400).json({status:false,data:{message:error.message}});
     }
-    const { bankName, accountNumber,email } = req.body;
+    const { bankName, accountNumber } = req.body;
 
     if (!bankName || !accountNumber) {
         return res.status(400).json({ error: 'Bank name and account number are required.' });
@@ -353,8 +353,6 @@ class AuthController{
 
     try {
         // Get the bank code using the bank name
-        let foundUser = await UserModel.findOne({email:email})
-        if(!foundUser) return res.status(400).json({ status: false, data: { message: "user not found"} });   
         const bankCode = await getBankCodeByName(bankName);
 
         if (!bankCode) {

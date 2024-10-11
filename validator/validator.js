@@ -165,15 +165,14 @@ const validateResetPasswordInput = Joi.object({
       
        
         const  validateAccountInput = Joi.object({
-         email: Joi.any().strip(),
          bankName: Joi.string().required(),  
          accountNumber: Joi.string()
           .pattern(/^[0-9]{10}$/) 
           .required()
           .messages({
             'string.pattern.base': 'Bank number must be exactly 10 digits and contain only numbers.',
-            'string.empty': 'Pin is required.',
-            'any.required': 'Pin is required.',
+            'string.empty': 'Bank number is required.',
+            'any.required': 'Bank number is required.',
           })
           })
           const validateNinInput= Joi.object({
