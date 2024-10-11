@@ -16,7 +16,13 @@ const userSchema = new mongoose.Schema({
     password:String,
     v_code:String,
     img:String,
+
     referralCode:String,
+    is_kyc: { 
+      type: Boolean,
+      enum: [true,false,],
+      default:false,
+      },
     verified: { 
         type: Boolean,
         enum: [true,false,],
@@ -34,7 +40,7 @@ const User = mongoose.model('User', userSchema);
 // User.find().then(e=>{
 //     console.log(e)
 // })
-// User.updateMany({role:"BUYER_INVESTOR"},{$set:{role:"buyer_investor"}}).then(e=>{
+// User.updateMany({role:"BUYER_INVESTOR"},{$set:{is_kyc:false}}).then(e=>{
 //     console.log(e)
 // })
 

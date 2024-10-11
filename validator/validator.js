@@ -136,14 +136,30 @@ const validateResetPasswordInput = Joi.object({
       })
 
       const validateBvnInput = Joi.object({
-        email: Joi.any().strip(),
+        bankName: Joi.string().required(), 
+        accountNumber: Joi.string()
+        .pattern(/^[0-9]{10}$/) 
+        .required()
+        .messages({
+          'string.pattern.base': 'Bank number must be exactly 10 digits and contain only numbers.',
+          'string.empty': 'Bank number required.',
+          'any.required': 'Bank number is required.',
+        }),
         bvn: Joi.string()
         .pattern(/^[0-9]{11}$/) 
         .required()
         .messages({
           'string.pattern.base': 'BVN must be exactly 11 digits and contain only numbers.',
-          'string.empty': 'Pin is required.',
-          'any.required': 'Pin is required.',
+          'string.empty': 'Bvn is required.',
+          'any.required': 'Bvn is required.',
+        }),
+        nin: Joi.string()
+        .pattern(/^[0-9]{11}$/) 
+        .required()
+        .messages({
+          'string.pattern.base': 'Nin must be exactly 11 digits and contain only numbers.',
+          'string.empty': 'Nin is required.',
+          'any.required': 'Nin is required.',
         })
         })
       
@@ -155,7 +171,7 @@ const validateResetPasswordInput = Joi.object({
           .pattern(/^[0-9]{10}$/) 
           .required()
           .messages({
-            'string.pattern.base': 'Bank name must be exactly 10 digits and contain only numbers.',
+            'string.pattern.base': 'Bank number must be exactly 10 digits and contain only numbers.',
             'string.empty': 'Pin is required.',
             'any.required': 'Pin is required.',
           })

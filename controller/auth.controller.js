@@ -103,7 +103,9 @@ class AuthController{
         if (!user) {
           return res.status(400).json({ status: false, data: { message: "User does not exist." } });
         }
-    
+        if(user.is_kyc == false) {
+          return res.status(400).json({ status: false, data: { message: "Please complete your kyc." } });
+        }
         // Check for password if provided
         const passwordMatch = password && await bcrypt.compare(password, user.password);
         
@@ -294,25 +296,27 @@ class AuthController{
      
     }
 
-    async postVerifyBvn(req,res) {
+    async postSaveUserDetails(req,res) {
       try {
         
         const { error } = validateBvnInput.validate(req.body);
         if (error) {
           return res.status(400).json({status:false,data:{message:error.message}});
         }
-        const {email, bvn } = req.body;
+        const {bvn,accountNumber,bankName,nin } = req.body;
 
         if (!bvn) {
             return res.status(400).json({ message: 'BVN is required' });
         }
         try {
-           // const result = await verifyBvn(bvn);
-            let foundUser = await UserModel.findOne({email:req.body.email})
+            let foundUser = await UserModel.findOne({_id:req.user.id})
             if(!foundUser) return res.status(400).json({ status: false, data: { message: "user not found"} });    
             foundUser.proof_of_identity.bvn = bvn
-            await foundUser.save()
-              return res.status(200).json({ status:true, data:{message:"bvn saved successfully"}});
+            foundUser.proof_of_identity.nin = nin
+            foundUser.proof_of_identity.bank_name = bankName
+            foundUser.proof_of_identity.bank_number = accountNumber
+      await foundUser.save()
+              return res.status(200).json({ status:true, data:{message:"user details saved successfully"}});
         } catch (error) {
             return res.status(500).json({ status: false, data:{message: error.message} });
         }
@@ -359,9 +363,7 @@ class AuthController{
 
         // Resolve account number using Paystack's API
         const accountDetails = await resolveAccountNumber(accountNumber, bankCode);
-        foundUser.proof_of_identity.bank_name = bankName
-        foundUser.proof_of_identity.bank_number = accountNumber
-      await foundUser.save()
+        
         return res.json({
             success: true,
             message: 'Account details retrieved successfully.',
@@ -373,38 +375,15 @@ class AuthController{
     }
   }
 
-  async setNin(req,res){
-    const { error } = validateNinInput.validate(req.body);
-    if (error) {
-      return res.status(400).json({status:false,data:{message:error.message}});
-    }
-    const { nin,email } = req.body;
 
-   
-    try {
-        let foundUser = await UserModel.findOne({email:email})
-        if(!foundUser) return res.status(400).json({ status: false, data: { message: "user not found"} });   
 
-      
-
-        foundUser.proof_of_identity.nin = nin
-      await foundUser.save()
-        return res.json({
-            success: true,
-            message: 'nin successfully.',
-        });
-    } catch (error) {
-        return res.status(400).json({status:true, data:{message:error.message }})
-
-    }
-  }
   async savePin(req,res){
     const { error } = validatePinInput.validate(req.body);
     console.log(req.body.email)
     if (error) {
       return res.status(400).json({status:false,data:{message:error.details[0].message}});
     }
-    let foundUser = await UserModel.findOne({email:req.body.email})
+    let foundUser = await UserModel.findOne({_id:req.user.id})
     if(!foundUser) return res.status(400).json({ status: false, data: { message: "user not found"} });
     const hash = await hashPassword(req.body.pin);
    foundUser.pin = hash
