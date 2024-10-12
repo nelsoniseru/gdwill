@@ -52,6 +52,7 @@ class TransactionController{
     }
   }
   async history(req, res) {
+    console.log(req.user.id)
     let transactions = await Transaction.find({ user: req.user.id }).sort({ createdAt: -1 });
     return res.status(200).json({ status: true,data:{ history:transactions }});
   }
@@ -84,7 +85,7 @@ if(t_user.balance < amount){
   reason,
   note,
   amount,
-  user: user._id
+  user: t_user._id
 });
 
 // Update user's balance

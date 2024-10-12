@@ -15,9 +15,9 @@ const userSchema = new mongoose.Schema({
 });
   
 const User = mongoose.model('User', userSchema);
-// User.find().then(e=>{
-//     console.log(e)
-// })
+User.find().then(e=>{
+    console.log(e)
+})
 // User.updateMany({},{$set:{balance:0}}).then(e=>{
 //     console.log(e)
 // })
