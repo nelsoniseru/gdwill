@@ -87,9 +87,9 @@ class AuthController{
       return res.status(200).json({ status: true, data: { user } });
     }
   async  getBalance(req, res) {
-    const total_withdrawal = await Transaction.find({user:req.user.id,transaction_type:"withdrawal"});
+    const total_withdrawal = await Transaction.find({user:req.user.id});
     const user = await UserModel.find({_id:req.user.id});
-      return res.status(200).json({ status: true, data: { balance:user.balance,total_withdrawal:total_withdrawal.length } });
+      return res.status(200).json({ status: true, data: { balance:user.balance } });
   }
 }
 

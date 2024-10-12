@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const transactionSchema = new mongoose.Schema({
     transaction_type:{
         type: String,
-        enum: ["deposit", "credit", "debit","withdrawal"],  
+        enum: ["deposit", "credit", "debit"],  
       },   
     account_number:Number, 
     account_name:String, 
