@@ -43,7 +43,7 @@ class AuthController{
             password: hash,
      
           });
-          return res.status(201).json({ status: true, data: { message: "registration was successfully"}});
+          return res.status(201).json({ status: true, data: { message: "registration was successfully", token: generateToken(newUser)}});
         } catch (error) {
           return res.status(500).json({ status: false, data: { message: "Something went wrong" } });
         }

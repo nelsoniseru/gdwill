@@ -92,6 +92,7 @@ t_user.balance -= amount;
 user.balance += amount;
 await user.save();
 await t_user.save();
+return res.status(400).json({ status:true, data: { message: "transaction successful" } });
 
 
 }
