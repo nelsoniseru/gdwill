@@ -53,7 +53,7 @@ class TransactionController{
   }
   async history(req, res) {
     let transactions = await Transaction.find({ user: req.user.id }).sort({ createdAt: -1 });
-    return res.status(200).json({ status: true,data:{ history:t }});
+    return res.status(200).json({ status: true,data:{ history:transactions }});
 
   }
   async transaction(req, res) {
