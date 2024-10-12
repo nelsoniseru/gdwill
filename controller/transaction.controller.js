@@ -44,7 +44,7 @@ class TransactionController{
       // Update user's balance
       user.balance += amount;
       await user.save();
- 
+      await transaction.save()
       return res.status(200).json({ status: true,data:{message: "Deposit successful", balance: user.balance }});
 
     } catch (error) {

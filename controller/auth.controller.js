@@ -24,21 +24,22 @@ class AuthController{
             return res.status(400).json({ status: false, data: { message: error.details[0].message } });
           }
       
-          const { email, password,phone,   full_name } = req.body;
+          const { email, password,phone,full_name } = req.body;
       
           // Check if the email already exists
           const emailExist = await UserModel.findOne({ email });
           if (emailExist) {
             return res.status(400).json({ status: false, data: { message: "email already exist" } });
           }
-      
+          const formattedPhone = phone.slice(1); 
+
           // Hash the password
           const hash = await hashPassword(password);
           // Create a new user
           const newUser = await UserModel.create({
             email,
             full_name,
-            phone,
+            phone:formattedPhone,
             password: hash,
      
           });
