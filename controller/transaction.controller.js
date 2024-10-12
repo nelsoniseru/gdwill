@@ -77,7 +77,7 @@ return res.status(400).json({ status: false, data: { message: "Invalid password"
 if(t_user < amount){
   return res.status(400).json({ status: false, data: { message: "Insufficient fund" } });
 }
- const transaction = new Transaction({
+ const transaction =  Transaction.create({
   transaction_type,
   account_number:user.account_number,
   account_name:user.account_name,
