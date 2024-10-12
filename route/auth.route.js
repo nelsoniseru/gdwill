@@ -1,6 +1,5 @@
 const express = require("express")
 const authController = require("../controller/auth.controller")
-const upload = require("../utils/multer")
 const {
     validateUserLoginInput,
     validateUserRegisterInput,

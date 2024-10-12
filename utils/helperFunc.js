@@ -15,23 +15,9 @@ const hashPassword = async (password) => {
 
 
 
-  const generateNumericOTP = (length) => {
-    let otp = '';
-    const digits = '0123456789';
-    for (let i = 0; i < length; i += 1) {
-      const randomIndex = Math.floor(Math.random() * digits.length);
-      otp += digits[randomIndex];
-    }
-    return otp;
-  };
 
-  const isAdmin = async(id) => {
-    let user =  await UserModel.findOne({_id:id})
-    let is_Admin  = user.role == "admin"? true : false
-    return is_Admin ;
-  };
   module.exports  =  {
     hashPassword,
-    generateNumericOTP,
-    isAdmin 
+
+
   }

@@ -10,12 +10,7 @@ const {
     validateUserLoginInput,
 
     } = require('../validator/validator')
-    const path = require("path")
-    const { sendEmailWithTemplate } = require('../utils/sendTemp');
-    const templatePath = path.join(__dirname, '../utils/ireach.html');
-    const templatePath2 = path.join(__dirname, '../utils/forgotpassword.html');
-    const templatePath3 = path.join(__dirname, '../utils/resend.html');
-    
+
   
   
 

@@ -6,8 +6,8 @@ const transactionSchema = new mongoose.Schema({
         enum: ["deposit", "credit", "debit","withdrawal"],  
       },   
     account_number:Number, 
-    account_name:Number, 
-    amount,
+    account_name:String, 
+    amount:Number,
     user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
