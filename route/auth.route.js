@@ -13,15 +13,8 @@ const router = express.Router()
 
 router.post("/register",authController.Register)
 router.post("/login",authController.Login)
-router.post("/resend-code",authController.PostResend)
-router.post("/verify-code",authController.PostVerifyCode)
-router.post("/verify-email",authController.postVerifyMail)
-router.put("/reset-password",authController.postResetPassword)
-router.put("/profile-edit",authMiddleWare,authController.postEditProfile)
-router.put("/password-edit",authMiddleWare,authController.passwordEdit)
-router.post("/save-user-details",authMiddleWare,authController.postSaveUserDetails)
-router.get("/all-banks",authController.getAllBanks)
-router.post("/resolve",authController.resolveAccount)
-router.post("/save-pin",authMiddleWare,authController.savePin)
+router.get("/get-all-users",authController.getUsers)
+router.get("/get-balance",authMiddleWare,authController.getBalance)
+
 
 module.exports = router;

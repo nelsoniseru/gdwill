@@ -2,36 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs")
 
 const userSchema = new mongoose.Schema({
-    first_name: String,
-    last_name: String,
+    full_name: String,
+    balance: Number,
     email: String,
-    gender:{
-        type: String,
-        enum: ["male", "female"],  
-      }, 
-    dob:Date,
-    pin:String,
-    phone:String,
-    proof_of_identity:{bank_name:String,bank_number:String,bvn:Number,nin:Number},
-    password:String,
-    v_code:String,
-    img:String,
-
-    referralCode:String,
-    is_kyc: { 
-      type: Boolean,
-      enum: [true,false,],
-      default:false,
-      },
-    verified: { 
-        type: Boolean,
-        enum: [true,false,],
-        default:false,
-        },
-    role: { 
-        type: String,
-        enum: ["admin","realtor","buyer_investor"],
-        },
+    phone: String,
+    password:String
   },{
     timestamps:true
 });
