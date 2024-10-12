@@ -3,7 +3,10 @@ const bcrypt = require("bcryptjs")
 
 const userSchema = new mongoose.Schema({
     full_name: String,
-    balance: Number,
+    balance:{
+      type:Number,
+      default:0
+    } ,
     email: String,
     phone: String,
     password:String
@@ -15,7 +18,7 @@ const User = mongoose.model('User', userSchema);
 // User.find().then(e=>{
 //     console.log(e)
 // })
-// User.updateMany({role:"BUYER_INVESTOR"},{$set:{is_kyc:false}}).then(e=>{
+// User.updateMany({},{$set:{balance:0}}).then(e=>{
 //     console.log(e)
 // })
 
