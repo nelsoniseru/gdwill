@@ -61,7 +61,7 @@ class AuthController{
         const { email, password} = req.body;
     
         // Find the user by email
-        const user = await UserModel.findOne({ email }).select('-password');
+        const user = await UserModel.findOne({ email });
         if (!user) {
           return res.status(400).json({ status: false, data: { message: "User does not exist." } });
         }
@@ -72,8 +72,11 @@ class AuthController{
             if (!passwordMatch) {
           return res.status(400).json({ status: false, data: { message: "Invalid credentials." } });
         }
-        return res.status(200).json({ status: true, data: { message: "User login successful", token: generateToken(user),user } });
+        const userWithoutPassword = user.toObject();
+        delete userWithoutPassword.password;
+        return res.status(200).json({ status: true, data: { message: "User login successful", token: generateToken(user),user:userWithoutPassword } });
       } catch (error) {
+        console.log(error)
         return res.status(500).json({ status: false, data: { message: error.message } });
       }
     }
