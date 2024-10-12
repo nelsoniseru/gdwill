@@ -88,7 +88,7 @@ class AuthController{
     }
   async  getBalance(req, res) {
     const user = await UserModel.find({_id:req.user.id});
-      return res.status(200).json({ status: true, data: { balance:user.balance } });
+      return res.status(200).json({ status: true, data: { user } });
   }
 }
 

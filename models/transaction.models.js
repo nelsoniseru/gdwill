@@ -20,4 +20,6 @@ const Transaction = mongoose.model('Transaction', transactionSchema);
 Transaction.find().then(e=>{
     console.log(e)
 })
+
+
 module.exports = Transaction

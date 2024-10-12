@@ -22,6 +22,7 @@ const User = mongoose.model('User', userSchema);
 //     console.log(e)
 // })
 
+
 // async function a(){
 //     const saltRounds = 10;
 //     const hashedPassword = await new Promise((resolve, reject) => {
