@@ -57,7 +57,7 @@ class TransactionController{
 
   }
   async transaction(req, res) {
- const id = req.query.id
+ const id = req.params.id
  const { error } = validateTransactionInput.validate(req.body);
     
  // If validation fails, return an error response
