@@ -24,7 +24,7 @@ class AuthController{
             return res.status(400).json({ status: false, data: { message: error.details[0].message } });
           }
       
-          const { email, password, first_name,dob,gender,phone,role,last_name, img,referralCode } = req.body;
+          const { email, password,phone,   full_name } = req.body;
       
           // Check if the email already exists
           const emailExist = await UserModel.findOne({ email });

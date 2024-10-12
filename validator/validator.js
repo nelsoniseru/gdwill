@@ -8,14 +8,8 @@ const validateUserLoginInput = Joi.object({
 
 
 const validateUserRegisterInput = Joi.object({
-    first_name: Joi.string().required(),
-    last_name: Joi.string().required(),
-    role:Joi.string().required(),
+    full_name: Joi.string().required(),
     email: Joi.string().email().required(),
-    img: Joi.string().allow(),
-    referralCode: Joi.string().allow(),
-    dob: Joi.date().required(),
-    gender: Joi.string().required(),
     phone: Joi.string().required(),
     password: Joi.string()
       .min(8).required().messages({
