@@ -54,8 +54,8 @@ class TransactionController{
   async history(req, res) {
     let transactions = await Transaction.find({ user: req.user.id }).sort({ createdAt: -1 });
     return res.status(200).json({ status: true,data:{ history:transactions }});
-
   }
+
   async transaction(req, res) {
  const id = req.params.id
  const { error } = validateTransactionInput.validate(req.body);
@@ -77,7 +77,7 @@ return res.status(400).json({ status: false, data: { message: "Invalid password"
 if(t_user < amount){
   return res.status(400).json({ status: false, data: { message: "Insufficient fund" } });
 }
- const transaction =  Transaction.create({
+ const transaction = await Transaction.create({
   transaction_type,
   account_number:user.account_number,
   account_name:user.account_name,
@@ -93,7 +93,6 @@ user.balance += amount;
 await user.save();
 await t_user.save();
 return res.status(400).json({ status:true, data: { message: "transaction successful" } });
-
 
 }
 

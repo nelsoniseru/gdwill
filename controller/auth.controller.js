@@ -83,13 +83,30 @@ class AuthController{
     }
   
     async getUsers(req, res) {
-      const user = await UserModel.find({});
-      return res.status(200).json({ status: true, data: { user } });
-    }
-  async  getBalance(req, res) {
+        try {
+          const { phone } = req.query;
+          let users;
+          if (phone) {
+            users = await UserModel.find({ phone });  
+            if (users.length === 0) {
+              return res.status(404).json({ status: false, data: { message: "No users found with the provided phone number" } });
+            }
+          } else {
+            users = await UserModel.find({});  
+          }
+      
+          return res.status(200).json({ status: true, data: { users } });
+        } catch (error) {
+          return res.status(500).json({ status: false, data: { message: "Something went wrong" } });
+        }
+      }
+      
+    
+  async getBalance(req, res){
     const user = await UserModel.findOne({_id:req.user.id});
-      return res.status(200).json({ status: true, data: { user } });
+    return res.status(200).json({ status: true, data:{ user }})
   }
+
 }
 
  module.exports = new AuthController()
