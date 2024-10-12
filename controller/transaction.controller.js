@@ -52,10 +52,25 @@ class TransactionController{
     }
   }
   async history(req, res) {
-    console.log(req.user.id)
-    let transactions = await Transaction.find({ user: req.user.id }).sort({ createdAt: -1 });
-    return res.status(200).json({ status: true,data:{ history:transactions }});
+    try {
+      const { transaction_type } = req.query; // Capture the transaction_type from query params
+      let filter = { user: req.user.id }; // Base filter with user ID
+  
+      // If transaction_type is provided, add a regex filter for transaction_type
+      if (transaction_type) {
+        const typeRegex = new RegExp(transaction_type, 'i'); // 'i' makes it case-insensitive
+        filter.transaction_type = { $regex: typeRegex };
+      }
+  
+      // Find transactions based on the filter and sort by creation date (latest first)
+      let transactions = await Transaction.find(filter).sort({ createdAt: -1 });
+  
+      return res.status(200).json({ status: true, data: { history: transactions } });
+    } catch (error) {
+      return res.status(500).json({ status: false, data: { message: "Something went wrong" } });
+    }
   }
+  
 
   async transaction(req, res) {
  const id = req.params.id

@@ -83,23 +83,39 @@ class AuthController{
     }
   
     async getUsers(req, res) {
-        try {
-          const { phone } = req.query;
-          let users;
-          if (phone) {
-            users = await UserModel.find({ phone });  
-            if (users.length === 0) {
-              return res.status(404).json({ status: false, data: { message: "No users found with the provided phone number" } });
-            }
-          } else {
-            users = await UserModel.find({});  
+      try {
+        const { phone } = req.params; // Capture phone from route params
+        let users;
+    
+        if (phone) {
+          // Use RegExp to match phone numbers starting with the provided input
+          const phoneRegex = new RegExp(`^${phone}`, 'i'); // 'i' for case-insensitive, '^' ensures it starts with the input
+          users = await UserModel.find({
+            phone: { $regex: phoneRegex },
+            _id: { $ne: req.user.id } // Exclude the current logged-in user
+          });
+          
+          if (users.length === 0) {
+            // If no users found with the provided phone number
+            return res.status(404).json({ status: false, data: { message: "No users found with the provided phone number" } });
           }
-      
-          return res.status(200).json({ status: true, data: { users } });
-        } catch (error) {
-          return res.status(500).json({ status: false, data: { message: "Something went wrong" } });
+        } else {
+          // Return all users except the logged-in user if no phone is provided in params
+          users = await UserModel.find({
+            _id: { $ne: req.user.id } // Exclude the current logged-in user
+          });
         }
+    
+        // Return the list of users
+        return res.status(200).json({ status: true, data: { users } });
+        
+      } catch (error) {
+        // Handle any server-side errors
+        return res.status(500).json({ status: false, data: { message: "Something went wrong" } });
       }
+    }
+    
+    
       
     
   async getBalance(req, res){
