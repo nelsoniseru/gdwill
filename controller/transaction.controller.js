@@ -74,7 +74,7 @@ class TransactionController{
  if (!passwordMatch) {
 return res.status(400).json({ status: false, data: { message: "Invalid password" } });
 }
-if(t_user < amount){
+if(t_user.balance < amount){
   return res.status(400).json({ status: false, data: { message: "Insufficient fund" } });
 }
  const transaction = await Transaction.create({
