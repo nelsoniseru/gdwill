@@ -80,7 +80,7 @@ class TransactionController{
  if (error) {
    return res.status(400).json({ status: false, data: { message: error.details[0].message } });
  }
- const {amount,reason,note,password,transaction_type} = req.body
+ const {amount,reason,note,password} = req.body
 
  const user = await User.findOne({_id:id});
  const t_user = await User.findOne({_id:req.user.id});

@@ -39,7 +39,6 @@ const validateUserRegisterInput = Joi.object({
               reason: Joi.string().allow(),
               note: Joi.string().allow(),
               password: Joi.string().required(),
-              transaction_type: Joi.string().required()
              })
    module.exports =  {
   validateUserLoginInput,
