@@ -40,14 +40,14 @@ class AuthController{
           // Hash the password
           const hash = await hashPassword(password);
           // Create a new user
-          const newUser = await UserModel.create({
+          const user = await UserModel.create({
             email,
             full_name,
             phone:formattedPhone,
             password: hash,
      
           });
-          return res.status(201).json({ status: true, data: { message: "registration was successfully", token: generateToken(newUser),newUser}});
+          return res.status(201).json({ status: true, data: { message: "registration was successfully", token: generateToken(user),user}});
         } catch (error) {
           return res.status(500).json({ status: false, data: { message: "Something went wrong" } });
         }

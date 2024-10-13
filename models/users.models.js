@@ -18,7 +18,7 @@ const User = mongoose.model('User', userSchema);
 User.find().then(e=>{
     console.log(e)
 })
-// User.deleteOne({_id:"670b85a211a817068745821b"}).then(e=>{
+// User.deleteOne({_id:"670b88bb0426946d03703319"}).then(e=>{
 //     console.log(e)
 // })
 
