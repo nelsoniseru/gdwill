@@ -28,8 +28,12 @@ class AuthController{
       
           // Check if the email already exists
           const emailExist = await UserModel.findOne({ email });
+          const phoneExist = await UserModel.findOne({ phone });
           if (emailExist) {
             return res.status(400).json({ status: false, data: { message: "email already exist" } });
+          }
+          if (phoneExist) {
+            return res.status(400).json({ status: false, data: { message: "account already exist" } });
           }
           const formattedPhone = phone.slice(1); 
 

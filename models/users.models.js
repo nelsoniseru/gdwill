@@ -18,11 +18,13 @@ const User = mongoose.model('User', userSchema);
 User.find().then(e=>{
     console.log(e)
 })
-// User.updateMany({},{$set:{balance:0}}).then(e=>{
+// User.deleteOne({_id:"670b85a211a817068745821b"}).then(e=>{
 //     console.log(e)
 // })
 
-
+User.find({}).then(e=>{
+    console.log(e)
+})
 // async function a(){
 //     const saltRounds = 10;
 //     const hashedPassword = await new Promise((resolve, reject) => {
