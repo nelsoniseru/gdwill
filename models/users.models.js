@@ -15,16 +15,16 @@ const userSchema = new mongoose.Schema({
 });
   
 const User = mongoose.model('User', userSchema);
-User.find().then(e=>{
-    console.log(e)
-})
-// User.deleteOne({_id:"670b8b96e13fdd3f9d1993e7"}).then(e=>{
+// User.find().then(e=>{
+//     console.log(e)
+// })
+// User.deleteMany({}).then(e=>{
 //     console.log(e)
 // })
 
-User.find({}).then(e=>{
-    console.log(e)
-})
+// User.find({}).then(e=>{
+//     console.log(e)
+// })
 // async function a(){
 //     const saltRounds = 10;
 //     const hashedPassword = await new Promise((resolve, reject) => {
