@@ -96,15 +96,24 @@ if(t_user.balance < amount){
   return res.status(400).json({ status: false, data: { message: "Insufficient fund" } });
 }
  const transaction = await Transaction.create({
-  transaction_type,
+  transaction_type:"credit",
   account_number:user.phone,
   account_name:user.full_name,
   reason,
   note,
   amount,
-  user: t_user._id
+  user:user._id
 });
 
+const transaction2 = await Transaction.create({
+  transaction_type:"debit",
+  account_number:t_user.phone,
+  account_name:t_user.full_name,
+  reason,
+  note,
+  amount,
+  user: t_user._id
+});
 // Update user's balance
 t_user.balance -= amount;
 user.balance += amount;
