@@ -81,9 +81,11 @@ class TransactionController{
    return res.status(400).json({ status: false, data: { message: error.details[0].message } });
  }
  const {amount,reason,note,password,transaction_type} = req.body
+
  const user = await User.findOne({_id:id});
  const t_user = await User.findOne({_id:req.user.id});
  const passwordMatch = await bcrypt.compare(password, t_user.password);
+
  if (!user) {
   return res.status(404).json({ status: false, data:{message: "User not found" }});
 }
@@ -95,8 +97,8 @@ if(t_user.balance < amount){
 }
  const transaction = await Transaction.create({
   transaction_type,
-  account_number:user.account_number,
-  account_name:user.account_name,
+  account_number:user.phone,
+  account_name:user.full_name,
   reason,
   note,
   amount,

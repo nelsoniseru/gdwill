@@ -8,6 +8,8 @@ const transactionSchema = new mongoose.Schema({
     account_number:Number, 
     account_name:String, 
     amount:Number,
+    reason:String,
+    note:String,
     user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
