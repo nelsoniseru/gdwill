@@ -88,7 +88,7 @@ class AuthController{
   
     async getUsers(req, res) {
       try {
-        const { phone } = req.params; // Capture phone from route params
+        const { phone } = req.query; // Capture phone from route params
         let users;
     
         if (phone) {
@@ -115,6 +115,7 @@ class AuthController{
         
       } catch (error) {
         // Handle any server-side errors
+        console.log(error)
         return res.status(500).json({ status: false, data: { message: "Something went wrong" } });
       }
     }

@@ -12,7 +12,7 @@ const router = express.Router()
 
 router.post("/register",authController.Register)
 router.post("/login",authController.Login)
-router.get("/get-all-users",authController.getUsers)
+router.get("/get-all-users",authMiddleWare,authController.getUsers)
 router.get("/get-balance",authMiddleWare,authController.getBalance)
 
 
